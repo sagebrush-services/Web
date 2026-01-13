@@ -1,0 +1,7 @@
+name: "Sagebrush Services"
+language: "en-US"
+navigation:
+    - label: "Home"
+      url: "/"
+    - label: "API Docs"
+      url: "/api-docs"

@@ -1,0 +1,42 @@
+{{<html}}
+{{$main}}
+
+<div class="page">
+    <div id="api-docs">
+        <h1>{{page.title}}</h1>
+        {{& page.contents.html}}
+
+        <div id="swagger-ui"></div>
+    </div>
+</div>
+
+<style>
+    #swagger-ui {
+        margin-top: 2rem;
+    }
+</style>
+
+<script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+<script src="https://unpkg.com/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/swagger-ui-dist@5/swagger-ui.css" />
+
+<script>
+    window.onload = function() {
+        window.ui = SwaggerUIBundle({
+            url: "https://api.sagebrush.services/openapi.yaml",
+            dom_id: '#swagger-ui',
+            deepLinking: true,
+            presets: [
+                SwaggerUIBundle.presets.apis,
+                SwaggerUIStandalonePreset
+            ],
+            plugins: [
+                SwaggerUIBundle.plugins.DownloadUrl
+            ],
+            layout: "StandaloneLayout"
+        });
+    };
+</script>
+
+{{/main}}
+{{/html}}
