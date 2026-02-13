@@ -21,17 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Setup Git
-        run: |
-          git config --global credential.helper store
-          echo "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com" > ~/.git-credentials
-          git config --global url."https://github.com/".insteadOf "git@github.com:"
-          git config --global url."https://".insteadOf "git://"
-
       - name: Install Toucan
         run: |
-          brew tap toucansites/tap
-          brew install toucan
+          git clone https://github.com/toucansites/toucan.git /tmp/toucan
+          cd /tmp/toucan
+          make install
 
       - name: Generate site
         run: toucan generate
