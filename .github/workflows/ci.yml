@@ -21,10 +21,17 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - name: Setup Git
+        run: |
+          git config --global url."https://github.com/".insteadOf "git@github.com:"
+          git config --global url."https://".insteadOf "git://"
+
       - name: Install Toucan
         run: |
           brew tap toucansites/tap
           brew install toucan
+        env:
+          HOMEBREW_GITHUB_API_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Generate site
         run: toucan generate
