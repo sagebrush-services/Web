@@ -1,3 +1,4 @@
+---
 name: Staging - Mirror to CodeCommit
 
 on:
@@ -11,6 +12,10 @@ jobs:
     name: Mirror to AWS CodeCommit
     runs-on: ubuntu-latest
 
+    permissions:
+      id-token: write   # Required for OIDC token
+      contents: read    # Required for actions/checkout
+
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -20,9 +25,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
-          aws-access-key-id: ${{ secrets.AWS_CODECOMMIT_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_CODECOMMIT_SECRET_ACCESS_KEY }}
-          aws-region: ${{ secrets.AWS_CODECOMMIT_REGION }}
+          role-to-assume: ${{ secrets.AWS_CODECOMMIT_ROLE_ARN }}
+          aws-region: us-west-2
 
       - name: Install git-remote-codecommit
         run: pip install git-remote-codecommit
@@ -34,9 +38,9 @@ jobs:
 
       - name: Mirror to CodeCommit
         run: |
-          REPO_URL="codecommit::${{ secrets.AWS_CODECOMMIT_REGION }}://${{ secrets.CODECOMMIT_REPO_NAME }}"
+          REPO_URL="codecommit::us-west-2://${{ secrets.CODECOMMIT_REPO_NAME }}"
 
-          echo "🔄 Mirroring to CodeCommit: ${{ secrets.CODECOMMIT_REPO_NAME }}"
+          echo "Mirroring to CodeCommit: ${{ secrets.CODECOMMIT_REPO_NAME }}"
 
           # Add CodeCommit as remote
           git remote add codecommit "$REPO_URL" || true
@@ -47,12 +51,12 @@ jobs:
           # Push all tags
           git push codecommit --tags --force
 
-          echo "✅ Mirror complete"
+          echo "Mirror complete"
 
       - name: Verify mirror
         run: |
-          echo "📊 Repository mirrored to:"
-          echo "   Region: ${{ secrets.AWS_CODECOMMIT_REGION }}"
+          echo "Repository mirrored to staging CodeCommit:"
+          echo "   Region:     us-west-2"
           echo "   Repository: ${{ secrets.CODECOMMIT_REPO_NAME }}"
-          echo "   Branch: ${{ github.ref_name }}"
-          echo "   Commit: ${{ github.sha }}"
+          echo "   Branch:     ${{ github.ref_name }}"
+          echo "   Commit:     ${{ github.sha }}"
