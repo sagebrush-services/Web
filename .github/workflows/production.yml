@@ -1,0 +1,58 @@
+---
+name: Production - Mirror to CodeCommit
+
+on:
+  schedule:
+    - cron: "0 10 * * 2"  # Every Tuesday at 10:00 UTC
+  workflow_dispatch:  # Allow manual trigger
+
+jobs:
+  mirror:
+    name: Mirror to AWS CodeCommit (Production)
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0  # Full history for complete mirror
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_CODECOMMIT_PROD_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_CODECOMMIT_PROD_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_CODECOMMIT_PROD_REGION }}
+
+      - name: Install git-remote-codecommit
+        run: pip install git-remote-codecommit
+
+      - name: Configure git
+        run: |
+          git config --global user.name "GitHub Actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Mirror to CodeCommit
+        run: |
+          REPO_URL="codecommit::${{ secrets.AWS_CODECOMMIT_PROD_REGION }}://${{ secrets.CODECOMMIT_PROD_REPO_NAME }}"
+
+          echo "Mirroring to CodeCommit: ${{ secrets.CODECOMMIT_PROD_REPO_NAME }}"
+
+          # Add CodeCommit as remote
+          git remote add codecommit-prod "$REPO_URL" || true
+
+          # Push all branches
+          git push codecommit-prod --all --force
+
+          # Push all tags
+          git push codecommit-prod --tags --force
+
+          echo "Mirror complete"
+
+      - name: Verify mirror
+        run: |
+          echo "Repository mirrored to production CodeCommit:"
+          echo "   Region:     ${{ secrets.AWS_CODECOMMIT_PROD_REGION }}"
+          echo "   Repository: ${{ secrets.CODECOMMIT_PROD_REPO_NAME }}"
+          echo "   Branch:     ${{ github.ref_name }}"
+          echo "   Commit:     ${{ github.sha }}"
