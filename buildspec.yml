@@ -1,0 +1,24 @@
+# AWS CodeBuild buildspec for Sagebrush Web static site
+# Environment variables expected:
+# - S3_BUCKET: Target S3 bucket for built static assets
+# - CLOUDFRONT_DISTRIBUTION_ID: CloudFront distribution ID to invalidate
+
+version: 0.2
+
+phases:
+  install:
+    commands:
+      - echo "Installing Toucan static site generator..."
+      - curl -sL https://github.com/toucansites/toucan/releases/latest/download/toucan-linux-arm64.zip -o toucan.zip
+      - unzip -o toucan.zip && chmod +x toucan && mv toucan /usr/local/bin/toucan
+      - toucan --version
+
+  build:
+    commands:
+      - echo "Generating static site..."
+      - toucan generate
+      - echo "Syncing to S3..."
+      - aws s3 sync ./Output s3://$S3_BUCKET --delete
+      - echo "Invalidating CloudFront cache..."
+      - aws cloudfront create-invalidation --distribution-id $CLOUDFRONT_DISTRIBUTION_ID --paths "/*"
+      - echo "Deployment complete!"
