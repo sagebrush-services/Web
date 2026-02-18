@@ -1,0 +1,44 @@
+openapi: 3.1.0
+info:
+  title: Sagebrush API
+  version: 1.0.0
+  description: Swift-based Lambda API for Sagebrush Services
+
+servers:
+  - url: /
+    description: API Gateway base path
+
+paths:
+  /health:
+    get:
+      operationId: getHealth
+      summary: Health check endpoint
+      description: Returns service health status
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HealthResponse'
+
+components:
+  schemas:
+    HealthResponse:
+      type: object
+      required:
+        - status
+        - timestamp
+      properties:
+        status:
+          type: string
+          enum: [healthy, degraded, unhealthy]
+        timestamp:
+          type: string
+          format: date-time
+        database:
+          type: string
+          enum: [connected, disconnected]
+        storage:
+          type: string
+          enum: [available, unavailable]
