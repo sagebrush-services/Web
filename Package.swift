@@ -20,7 +20,14 @@ let package = Package(
         .package(
             url: "https://github.com/swift-server/swift-openapi-hummingbird.git", from: "2.0.0"),
         .package(url: "https://github.com/soto-project/soto.git", from: "7.3.0"),
-        .package(url: "https://github.com/vapor/postgres-nio.git", from: "1.22.0"),
+        .package(
+            url: "https://github.com/neon-law-foundation/SagebrushStandards.git", branch: "main"),
+        .package(url: "https://github.com/apple/swift-configuration.git", from: "1.0.0"),
+        .package(url: "https://github.com/vapor/fluent.git", from: "4.13.0"),
+        .package(
+            url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.12.0"),
+        .package(
+            url: "https://github.com/vapor/fluent-sqlite-driver.git", from: "4.8.1"),
     ],
     targets: [
         .executableTarget(
@@ -32,7 +39,11 @@ let package = Package(
                 .product(name: "OpenAPIHummingbird", package: "swift-openapi-hummingbird"),
                 .product(name: "SotoS3", package: "soto"),
                 .product(name: "SotoSecretsManager", package: "soto"),
-                .product(name: "PostgresNIO", package: "postgres-nio"),
+                .product(name: "SagebrushDAL", package: "SagebrushStandards"),
+                .product(name: "Fluent", package: "fluent"),
+                .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
+                .product(name: "FluentSQLiteDriver", package: "fluent-sqlite-driver"),
+                .product(name: "Configuration", package: "swift-configuration"),
             ],
             path: "Sources/App",
             plugins: [

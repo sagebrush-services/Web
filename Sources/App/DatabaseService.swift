@@ -1,83 +1,75 @@
-import Foundation
-import PostgresNIO
-import SotoSecretsManager
+import Fluent
+import FluentKit
+import FluentPostgresDriver
+import FluentSQLiteDriver
+import Logging
+import NIOCore
+import NIOPosix
 
 actor DatabaseService {
-  private var pool: PostgresClient?
-  private var awsClient: AWSClient?
-  private let secretArn: String
+  private let databases: Databases
+  private let databaseID: DatabaseID
 
-  init(secretArn: String) {
-    self.secretArn = secretArn
+  var db: any Database {
+    get throws {
+      guard
+        let database = databases.database(
+          databaseID,
+          logger: Logger(label: "db"),
+          on: MultiThreadedEventLoopGroup.singleton.any()
+        )
+      else {
+        throw DatabaseError.notConfigured
+      }
+      return database
+    }
   }
 
-  func connect() async throws {
-    guard pool == nil else { return }
-
-    guard !secretArn.isEmpty else {
-      throw DatabaseError.notConfigured
-    }
-
-    let client = AWSClient()
-    self.awsClient = client
-    let secretsManager = SecretsManager(client: client)
-
-    let response = try await secretsManager.getSecretValue(
-      .init(secretId: secretArn)
+  init(
+    env: String,
+    hostname: String = "",
+    port: Int = 5432,
+    username: String = "",
+    password: String = "",
+    database: String = ""
+  ) throws {
+    let databases = Databases(
+      threadPool: NIOThreadPool.singleton,
+      on: MultiThreadedEventLoopGroup.singleton
     )
 
-    guard let secretString = response.secretString,
-      let secretData = secretString.data(using: .utf8),
-      let secret = try? JSONDecoder().decode(DatabaseSecret.self, from: secretData)
-    else {
-      throw DatabaseError.invalidSecret
+    if env == "production" || env == "staging" {
+      let config = SQLPostgresConfiguration(
+        hostname: hostname,
+        port: port,
+        username: username,
+        password: password,
+        database: database,
+        tls: .disable
+      )
+      databases.use(
+        DatabaseConfigurationFactory.postgres(configuration: config),
+        as: .psql
+      )
+      self.databaseID = .psql
+    } else {
+      databases.use(DatabaseConfigurationFactory.sqlite(.memory), as: .sqlite)
+      self.databaseID = .sqlite
     }
 
-    let config = PostgresClient.Configuration(
-      host: secret.host,
-      port: secret.port,
-      username: secret.username,
-      password: secret.password,
-      database: secret.dbname,
-      tls: .prefer(.makeClientConfiguration())
-    )
-
-    pool = PostgresClient(configuration: config)
+    self.databases = databases
   }
 
   func healthCheck() async throws -> Bool {
-    try await connect()
-    guard let pool = pool else { return false }
-
-    let rows = try await pool.query("SELECT 1", logger: .init(label: "db-health"))
-
-    var hasRows = false
-    for try await _ in rows {
-      hasRows = true
-      break
-    }
-    return hasRows
+    try await (try db).transaction { _ in }
+    return true
   }
 
-  func shutdown() async throws {
-    self.pool = nil
-
-    if let client = awsClient {
-      try await client.shutdown()
-      self.awsClient = nil
-    }
+  func shutdown() {
+    databases.shutdown()
   }
-}
-
-struct DatabaseSecret: Codable {
-  let username: String
-  let password: String
-  let host: String
-  let port: Int
-  let dbname: String
 }
 
 enum DatabaseError: Error {
-  case invalidSecret
   case notConfigured
 }
