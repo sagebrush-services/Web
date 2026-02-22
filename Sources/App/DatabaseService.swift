@@ -5,6 +5,7 @@ import FluentSQLiteDriver
 import Logging
 import NIOCore
 import NIOPosix
+import StandardsDAL
 
 actor DatabaseService {
   private let databases: Databases
@@ -58,6 +59,19 @@ actor DatabaseService {
     }
 
     self.databases = databases
+  }
+
+  func migrate() async throws {
+    let migrations = Migrations()
+    migrations.add(StandardsDALConfiguration.migrations)
+    let migrator = Migrator(
+      databases: databases,
+      migrations: migrations,
+      logger: Logger(label: "fluent.migrations"),
+      on: MultiThreadedEventLoopGroup.singleton.any()
+    )
+    try await migrator.setupIfNeeded().get()
+    try await migrator.prepareBatch().get()
   }
 
   func healthCheck() async throws -> Bool {
