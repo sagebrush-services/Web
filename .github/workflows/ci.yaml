@@ -12,24 +12,18 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 60
 
     steps:
       - uses: actions/checkout@v4
 
-      - name: Install Toucan
-        run: |
-          git clone https://github.com/toucansites/toucan.git /tmp/toucan
-          cd /tmp/toucan
-          make install
+      - name: Install Swift toolchain
+        uses: swift-actions/setup-swift@v2
+        with:
+          swift-version: "6.0"
 
-      - name: Generate site
-        run: toucan generate
+      - name: Run Swift Format Lint
+        run: swift format lint --strict --recursive --parallel --no-color-diagnostics .
 
-      - name: Verify build output
-        run: |
-          if [ ! -d "dist" ]; then
-            echo "Error: dist directory not found"
-            exit 1
-          fi
-          echo "✅ Site built successfully"
+      - name: Build
+        run: swift build

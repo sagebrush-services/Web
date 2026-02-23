@@ -45,6 +45,7 @@ case "production", "staging":
 
 default:
   let databaseService = try DatabaseService(env: env)
+  try await databaseService.migrate()
 
   let router = Router()
   try APIHandler(databaseService: databaseService, storageService: storageService)
