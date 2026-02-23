@@ -56,8 +56,10 @@ let package = Package(
       name: "AppTests",
       dependencies: [
         .byName(name: "App"),
+        .product(name: "Hummingbird", package: "hummingbird"),
         .product(name: "HummingbirdTesting", package: "hummingbird"),
         .product(name: "JWTKit", package: "jwt-kit"),
+        .product(name: "SagebrushDAL", package: "SagebrushStandards"),
       ],
       path: "Tests/AppTests"
     ),
