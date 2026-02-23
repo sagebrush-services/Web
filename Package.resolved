@@ -1,5 +1,5 @@
 {
-  "originHash" : "208d3a3752e50380dbdf21fb391948716cf7548f50225f602546929a89fb9e53",
+  "originHash" : "d14ae965bad5d21feb99498d44acfbca3fe6ed098b481e182d94047b4ca5648f",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -89,6 +89,15 @@
       "state" : {
         "revision" : "3877a5060e85ae33e3b9fe51ab581784f65ec80e",
         "version" : "1.0.3"
+      }
+    },
+    {
+      "identity" : "jwt-kit",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/vapor/jwt-kit.git",
+      "state" : {
+        "revision" : "b5f82fb9dc238f2fcac53d721a222513a152613c",
+        "version" : "5.3.0"
       }
     },
     {
