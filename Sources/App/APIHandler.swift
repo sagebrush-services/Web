@@ -3,6 +3,7 @@ import OpenAPIRuntime
 
 struct APIHandler: APIProtocol {
   let databaseService: DatabaseService
+  let emailService: EmailService
   let storageService: StorageService
 
   func getHealth(

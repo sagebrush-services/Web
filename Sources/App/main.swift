@@ -10,7 +10,10 @@ import SotoSecretsManager
 let config = ConfigReader(provider: EnvironmentVariablesProvider())
 let env = config.string(forKey: "env", default: "local")
 let bucketName = config.string(forKey: "s3.bucket.name", default: "")
+let smtpSecretArn = config.string(forKey: "ses.smtp.secret.arn", default: "")
+let smtpFrom = config.string(forKey: "smtp.from", default: "")
 let storageService = StorageService(bucketName: bucketName)
+let emailService = EmailService(env: env, secretArn: smtpSecretArn, from: smtpFrom)
 
 switch env {
 case "production", "staging":
@@ -51,8 +54,11 @@ case "production", "staging":
   let router = Router(context: AppLambdaRequestContext.self)
   router.middlewares.add(CognitoAuthMiddleware(keyCollection: keyCollection))
   router.middlewares.add(AuthorizationMiddleware(db: db))
-  try APIHandler(databaseService: databaseService, storageService: storageService)
-    .registerHandlers(on: router)
+  try APIHandler(
+    databaseService: databaseService,
+    emailService: emailService,
+    storageService: storageService
+  ).registerHandlers(on: router)
   let lambda = APIGatewayV2LambdaFunction(router: router)
   try await lambda.runService()
 
@@ -61,8 +67,11 @@ default:
   try await databaseService.migrate()
 
   let router = Router(context: AppRequestContext.self)
-  try APIHandler(databaseService: databaseService, storageService: storageService)
-    .registerHandlers(on: router)
+  try APIHandler(
+    databaseService: databaseService,
+    emailService: emailService,
+    storageService: storageService
+  ).registerHandlers(on: router)
   let app = Application(
     router: router,
     configuration: .init(address: .hostname("localhost", port: 8080))
