@@ -37,7 +37,18 @@ case "production", "staging":
     database: creds.dbname
   )
 
-  let router = Router(context: BasicLambdaRequestContext<APIGatewayV2Request>.self)
+  let poolId = config.string(forKey: "cognito.user.pool.id", default: "")
+  let cognitoRegion = config.string(forKey: "cognito.region", default: "us-west-2")
+  let rawIssuerOverride = config.string(forKey: "jwt.issuer.override", default: "")
+  let issuerOverride: String? = rawIssuerOverride.isEmpty ? nil : rawIssuerOverride
+  let keyCollection = try await buildJWTKeyCollection(
+    poolId: poolId,
+    region: cognitoRegion,
+    issuerOverride: issuerOverride
+  )
+
+  let router = Router(context: AppLambdaRequestContext.self)
+  router.middlewares.add(CognitoAuthMiddleware(keyCollection: keyCollection))
   try APIHandler(databaseService: databaseService, storageService: storageService)
     .registerHandlers(on: router)
   let lambda = APIGatewayV2LambdaFunction(router: router)
@@ -47,7 +58,7 @@ default:
   let databaseService = try DatabaseService(env: env)
   try await databaseService.migrate()
 
-  let router = Router()
+  let router = Router(context: AppRequestContext.self)
   try APIHandler(databaseService: databaseService, storageService: storageService)
     .registerHandlers(on: router)
   let app = Application(
