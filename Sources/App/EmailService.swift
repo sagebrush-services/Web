@@ -27,13 +27,20 @@ actor EmailService {
 
     let awsClient = AWSClient()
     let secretsManager = SecretsManager(client: awsClient)
-    let secretResponse = try await secretsManager.getSecretValue(
-      .init(secretId: secretArn)
-    )
+    var secretsFetchError: (any Error)?
+    var secretResponse: SecretsManager.GetSecretValueResponse?
+    do {
+      secretResponse = try await secretsManager.getSecretValue(.init(secretId: secretArn))
+    } catch {
+      secretsFetchError = error
+    }
     try await awsClient.shutdown()
+    if let error = secretsFetchError {
+      throw error
+    }
 
     guard
-      let secretString = secretResponse.secretString,
+      let secretString = secretResponse?.secretString,
       let secretData = secretString.data(using: .utf8),
       let creds = try? JSONDecoder().decode(EmailCredentials.self, from: secretData)
     else {
