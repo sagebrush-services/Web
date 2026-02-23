@@ -47,8 +47,10 @@ case "production", "staging":
     issuerOverride: issuerOverride
   )
 
+  let db = try await databaseService.db
   let router = Router(context: AppLambdaRequestContext.self)
   router.middlewares.add(CognitoAuthMiddleware(keyCollection: keyCollection))
+  router.middlewares.add(AuthorizationMiddleware(db: db))
   try APIHandler(databaseService: databaseService, storageService: storageService)
     .registerHandlers(on: router)
   let lambda = APIGatewayV2LambdaFunction(router: router)
