@@ -2,6 +2,10 @@ import Foundation
 import Hummingbird
 import JWTKit
 
+#if canImport(FoundationNetworking)
+  import FoundationNetworking
+#endif
+
 struct CognitoAuthMiddleware<Context: AuthenticatedRequestContext>: RouterMiddleware {
   let keyCollection: JWTKeyCollection
 
