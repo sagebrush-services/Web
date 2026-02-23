@@ -57,6 +57,7 @@ let package = Package(
       dependencies: [
         .byName(name: "App"),
         .product(name: "HummingbirdTesting", package: "hummingbird"),
+        .product(name: "JWTKit", package: "jwt-kit"),
       ],
       path: "Tests/AppTests"
     ),
