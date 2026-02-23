@@ -39,6 +39,7 @@ let package = Package(
         .product(name: "OpenAPIRuntime", package: "swift-openapi-runtime"),
         .product(name: "OpenAPIHummingbird", package: "swift-openapi-hummingbird"),
         .product(name: "SotoS3", package: "soto"),
+        .product(name: "SotoSES", package: "soto"),
         .product(name: "SotoSecretsManager", package: "soto"),
         .product(name: "SagebrushDAL", package: "SagebrushStandards"),
         .product(name: "Fluent", package: "fluent"),
