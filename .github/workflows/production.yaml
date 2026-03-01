@@ -1,4 +1,6 @@
 ---
+# Mirrors this repo to AWS CodeCommit in the Sagebrush production account (978489150794).
+# Account definitions: github.com/sagebrush-services/AWS → Sources/Account.swift
 name: Production - Mirror to CodeCommit
 
 on:
