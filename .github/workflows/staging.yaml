@@ -1,4 +1,6 @@
 ---
+# Mirrors this repo to AWS CodeCommit in the Sagebrush staging account (889786867297).
+# Account definitions: github.com/sagebrush-services/AWS → Sources/Account.swift
 name: Staging - Mirror to CodeCommit
 
 on:
