@@ -1,7 +1,7 @@
 import AWSLambdaEvents
+import HarnessDAL
 import Hummingbird
 import HummingbirdLambda
-import StandardsDAL
 
 protocol AuthenticatedRequestContext: RequestContext {
   var cognitoUser: CognitoUser? { get set }

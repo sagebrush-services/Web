@@ -21,7 +21,7 @@ let package = Package(
       url: "https://github.com/swift-server/swift-openapi-hummingbird.git", from: "2.0.0"),
     .package(url: "https://github.com/soto-project/soto.git", from: "7.3.0"),
     .package(
-      url: "https://github.com/neon-law-foundation/SagebrushStandards.git", branch: "main"),
+      url: "https://github.com/neon-law-foundation/Harness.git", branch: "main"),
     .package(url: "https://github.com/apple/swift-configuration.git", from: "1.0.0"),
     .package(url: "https://github.com/vapor/fluent.git", from: "4.13.0"),
     .package(
@@ -41,7 +41,7 @@ let package = Package(
         .product(name: "SotoS3", package: "soto"),
         .product(name: "SotoSES", package: "soto"),
         .product(name: "SotoSecretsManager", package: "soto"),
-        .product(name: "SagebrushDAL", package: "SagebrushStandards"),
+        .product(name: "HarnessDAL", package: "Harness"),
         .product(name: "Fluent", package: "fluent"),
         .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
         .product(name: "FluentSQLiteDriver", package: "fluent-sqlite-driver"),
@@ -60,7 +60,7 @@ let package = Package(
         .product(name: "Hummingbird", package: "hummingbird"),
         .product(name: "HummingbirdTesting", package: "hummingbird"),
         .product(name: "JWTKit", package: "jwt-kit"),
-        .product(name: "SagebrushDAL", package: "SagebrushStandards"),
+        .product(name: "HarnessDAL", package: "Harness"),
       ],
       path: "Tests/AppTests"
     ),

@@ -1,13 +1,13 @@
 {
-  "originHash" : "d14ae965bad5d21feb99498d44acfbca3fe6ed098b481e182d94047b4ca5648f",
+  "originHash" : "eb53abc6d5a13ea88c1ebc9105fd834957d621bb02480c8da4fe649b555fdd4e",
   "pins" : [
     {
       "identity" : "async-http-client",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/swift-server/async-http-client.git",
       "state" : {
-        "revision" : "52ed9d172018e31f2dbb46f0d4f58d66e13c281e",
-        "version" : "1.31.0"
+        "revision" : "2fc4652fb4689eb24af10e55cabaa61d8ba774fd",
+        "version" : "1.32.0"
       }
     },
     {
@@ -62,6 +62,15 @@
       "state" : {
         "revision" : "73529a63ab11c7fe87da17b5a67a1b1f58c020f8",
         "version" : "4.8.1"
+      }
+    },
+    {
+      "identity" : "harness",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/neon-law-foundation/Harness.git",
+      "state" : {
+        "branch" : "main",
+        "revision" : "f9516542bcaec4cf809cb31ec59c23007baa0cd1"
       }
     },
     {
@@ -146,21 +155,12 @@
       }
     },
     {
-      "identity" : "sagebrushstandards",
-      "kind" : "remoteSourceControl",
-      "location" : "https://github.com/neon-law-foundation/SagebrushStandards.git",
-      "state" : {
-        "branch" : "main",
-        "revision" : "428ea165a83cafefdd3fd8c4197384a5fe3bd9eb"
-      }
-    },
-    {
       "identity" : "soto",
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/soto-project/soto.git",
       "state" : {
-        "revision" : "e67559846e8f746bcab2ad889e0a749bb29d44d5",
-        "version" : "7.12.0"
+        "revision" : "95513f2a8df8bdfff1e5cde951dfdf9c5a6b691e",
+        "version" : "7.13.0"
       }
     },
     {
@@ -168,8 +168,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/soto-project/soto-core.git",
       "state" : {
-        "revision" : "510e4ca86264267cfae1df066780706ca6cc4a5f",
-        "version" : "7.11.1"
+        "revision" : "ae265c8819c0067a2b361408ad92fca0fd60d667",
+        "version" : "7.13.0"
       }
     },
     {
@@ -258,8 +258,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/awslabs/swift-aws-lambda-runtime.git",
       "state" : {
-        "revision" : "22dd7012de6fe689bba0e0fddca141f7446ca5d1",
-        "version" : "2.6.3"
+        "revision" : "553b5e3716ef8e922e57b6f271248a808d23d0fb",
+        "version" : "2.8.0"
       }
     },
     {
@@ -429,8 +429,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/apple/swift-openapi-runtime.git",
       "state" : {
-        "revision" : "7cdf33371bf89b23b9cf4fd3ce8d3c825c28fbe8",
-        "version" : "1.9.0"
+        "revision" : "16c8eb7f65d28f5ddb8cb0dc1be5ec32e796fe45",
+        "version" : "1.10.1"
       }
     },
     {
@@ -465,8 +465,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/vapor/vapor.git",
       "state" : {
-        "revision" : "6d06e13021c299aa3300986f4eb5bb143d17ac9b",
-        "version" : "4.121.2"
+        "revision" : "a8db2dbda8b3cdc8a61bd35128590bd296e85563",
+        "version" : "4.121.3"
       }
     },
     {
