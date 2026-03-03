@@ -1,7 +1,7 @@
 import Foundation
+import HarnessDAL
 import Hummingbird
 import HummingbirdTesting
-import HarnessDAL
 import Testing
 
 @testable import App

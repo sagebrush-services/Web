@@ -2,10 +2,10 @@ import Fluent
 import FluentKit
 import FluentPostgresDriver
 import FluentSQLiteDriver
+import HarnessDAL
 import Logging
 import NIOCore
 import NIOPosix
-import HarnessDAL
 
 actor DatabaseService {
   private let databases: Databases

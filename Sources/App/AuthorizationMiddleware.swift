@@ -1,6 +1,6 @@
 import FluentKit
-import Hummingbird
 import HarnessDAL
+import Hummingbird
 
 struct AuthorizationMiddleware<Context: AuthorizedRequestContext>: RouterMiddleware {
   let db: any Database
