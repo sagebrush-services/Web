@@ -5,7 +5,7 @@ import FluentSQLiteDriver
 import Logging
 import NIOCore
 import NIOPosix
-import StandardsDAL
+import HarnessDAL
 
 actor DatabaseService {
   private let databases: Databases
@@ -63,7 +63,7 @@ actor DatabaseService {
 
   func migrate() async throws {
     let migrations = Migrations()
-    migrations.add(StandardsDALConfiguration.migrations)
+    migrations.add(HarnessDALConfiguration.migrations)
     let migrator = Migrator(
       databases: databases,
       migrations: migrations,
