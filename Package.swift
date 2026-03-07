@@ -21,13 +21,9 @@ let package = Package(
       url: "https://github.com/swift-server/swift-openapi-hummingbird.git", from: "2.0.0"),
     .package(url: "https://github.com/soto-project/soto.git", from: "7.3.0"),
     .package(
-      url: "https://github.com/neon-law-foundation/Harness.git", branch: "main"),
+      url: "https://github.com/neon-law-foundation/Harness.git",
+      branch: "feature/dry-and-rename-flow-alignment"),
     .package(url: "https://github.com/apple/swift-configuration.git", from: "1.0.0"),
-    .package(url: "https://github.com/vapor/fluent.git", from: "4.13.0"),
-    .package(
-      url: "https://github.com/vapor/fluent-postgres-driver.git", from: "2.12.0"),
-    .package(
-      url: "https://github.com/vapor/fluent-sqlite-driver.git", from: "4.8.1"),
     .package(url: "https://github.com/vapor/jwt-kit.git", from: "5.0.0"),
   ],
   targets: [
@@ -41,11 +37,9 @@ let package = Package(
         .product(name: "SotoS3", package: "soto"),
         .product(name: "SotoSES", package: "soto"),
         .product(name: "HarnessDAL", package: "Harness"),
-        .product(name: "Fluent", package: "fluent"),
-        .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
-        .product(name: "FluentSQLiteDriver", package: "fluent-sqlite-driver"),
+        .product(name: "HarnessOIDCMiddleware", package: "Harness"),
+        .product(name: "HarnessDatabaseService", package: "Harness"),
         .product(name: "Configuration", package: "swift-configuration"),
-        .product(name: "JWTKit", package: "jwt-kit"),
       ],
       path: "Sources/App",
       plugins: [
@@ -58,8 +52,9 @@ let package = Package(
         .byName(name: "App"),
         .product(name: "Hummingbird", package: "hummingbird"),
         .product(name: "HummingbirdTesting", package: "hummingbird"),
-        .product(name: "JWTKit", package: "jwt-kit"),
         .product(name: "HarnessDAL", package: "Harness"),
+        .product(name: "HarnessOIDCMiddleware", package: "Harness"),
+        .product(name: "JWTKit", package: "jwt-kit"),
       ],
       path: "Tests/AppTests"
     ),

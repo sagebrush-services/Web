@@ -1,6 +1,8 @@
 import AWSLambdaEvents
 import Configuration
 import Foundation
+import HarnessDatabaseService
+import HarnessOIDCMiddleware
 import Hummingbird
 import HummingbirdLambda
 import OpenAPIHummingbird
