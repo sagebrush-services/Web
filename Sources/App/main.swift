@@ -5,7 +5,6 @@ import Hummingbird
 import HummingbirdLambda
 import OpenAPIHummingbird
 import OpenAPIRuntime
-import SotoSecretsManager
 
 let config = ConfigReader(provider: EnvironmentVariablesProvider())
 let env = config.string(forKey: "env", default: "local")

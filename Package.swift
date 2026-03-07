@@ -40,7 +40,6 @@ let package = Package(
         .product(name: "OpenAPIHummingbird", package: "swift-openapi-hummingbird"),
         .product(name: "SotoS3", package: "soto"),
         .product(name: "SotoSES", package: "soto"),
-        .product(name: "SotoSecretsManager", package: "soto"),
         .product(name: "HarnessDAL", package: "Harness"),
         .product(name: "Fluent", package: "fluent"),
         .product(name: "FluentPostgresDriver", package: "fluent-postgres-driver"),
