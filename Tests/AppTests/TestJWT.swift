@@ -1,4 +1,5 @@
 import Foundation
+import HarnessOIDCMiddleware
 import JWTKit
 
 @testable import App

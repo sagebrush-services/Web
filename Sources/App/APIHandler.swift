@@ -1,4 +1,5 @@
 import Foundation
+import HarnessDatabaseService
 import OpenAPIRuntime
 
 struct APIHandler: APIProtocol {

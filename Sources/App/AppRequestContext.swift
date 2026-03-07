@@ -1,17 +1,10 @@
 import AWSLambdaEvents
 import HarnessDAL
+import HarnessOIDCMiddleware
 import Hummingbird
 import HummingbirdLambda
 
 /// Request context used in non-Lambda (local and staging) environments.
-protocol AuthenticatedRequestContext: RequestContext {
-  var authenticatedUser: AuthenticatedUser? { get set }
-}
-
-protocol AuthorizedRequestContext: AuthenticatedRequestContext {
-  var userRole: UserRole? { get set }
-}
-
 struct AppRequestContext: RequestContext, AuthorizedRequestContext {
   var coreContext: CoreRequestContextStorage
   var authenticatedUser: AuthenticatedUser?
