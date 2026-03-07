@@ -10,8 +10,6 @@ import SotoSecretsManager
 let config = ConfigReader(provider: EnvironmentVariablesProvider())
 let env = config.string(forKey: "env", default: "local")
 let smtpFrom = config.string(forKey: "smtp.from", default: "")
-let bucketName = config.string(forKey: "s3.bucket.name", default: "")
-let storageService = StorageService(bucketName: bucketName)
 let emailService = EmailService(env: env, from: smtpFrom)
 
 let oidcIssuerURL = config.string(forKey: "oidc.issuer.url", default: "")
@@ -21,6 +19,9 @@ switch env {
 case "production":
   let databaseURL = config.string(forKey: "database.url", default: "")
   let databaseService = try DatabaseService(databaseURL: databaseURL)
+
+  let productionBucketURL = config.string(forKey: "production.bucket.url", default: "")
+  let storageService = StorageService(productionBucketURL: productionBucketURL)
 
   let keyCollection = try await buildJWTKeyCollection(
     env: env,
@@ -51,6 +52,7 @@ default:
   let databaseService = DatabaseService()
   try await databaseService.migrate()
 
+  let storageService = StorageService(env: env)
   let router = Router(context: AppRequestContext.self)
   try APIHandler(
     databaseService: databaseService,
