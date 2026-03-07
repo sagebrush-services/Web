@@ -26,38 +26,33 @@ actor DatabaseService {
     }
   }
 
-  init(
-    env: String,
-    hostname: String = "",
-    port: Int = 5432,
-    username: String = "",
-    password: String = "",
-    database: String = ""
-  ) throws {
+  /// Creates a production database service connecting to Postgres via a connection URL.
+  ///
+  /// - Parameter databaseURL: A full Postgres connection URL, read from the `DATABASE_URL`
+  ///   environment variable (e.g. `postgres://user:password@host:5432/dbname`).
+  init(databaseURL: String) throws {
     let databases = Databases(
       threadPool: NIOThreadPool.singleton,
       on: MultiThreadedEventLoopGroup.singleton
     )
+    let config = try SQLPostgresConfiguration(url: databaseURL)
+    databases.use(DatabaseConfigurationFactory.postgres(configuration: config), as: .psql)
+    self.databaseID = .psql
+    self.databases = databases
+  }
 
-    if env == "production" || env == "staging" {
-      let config = SQLPostgresConfiguration(
-        hostname: hostname,
-        port: port,
-        username: username,
-        password: password,
-        database: database,
-        tls: .disable
-      )
-      databases.use(
-        DatabaseConfigurationFactory.postgres(configuration: config),
-        as: .psql
-      )
-      self.databaseID = .psql
-    } else {
-      databases.use(DatabaseConfigurationFactory.sqlite(.memory), as: .sqlite)
-      self.databaseID = .sqlite
-    }
-
+  /// Creates a local SQLite database service.
+  ///
+  /// - Parameter configuration: The SQLite configuration. Defaults to `.file("db.sqlite")` for
+  ///   local development — the file is gitignored. Pass `.memory` in tests to keep each
+  ///   test suite isolated and avoid file conflicts from parallel test runs.
+  init(configuration: SQLiteConfiguration = .file("db.sqlite")) {
+    let databases = Databases(
+      threadPool: NIOThreadPool.singleton,
+      on: MultiThreadedEventLoopGroup.singleton
+    )
+    databases.use(DatabaseConfigurationFactory.sqlite(configuration), as: .sqlite)
+    self.databaseID = .sqlite
     self.databases = databases
   }
 

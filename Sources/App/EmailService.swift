@@ -1,59 +1,32 @@
 import Foundation
+import Logging
 import SotoSES
-import SotoSecretsManager
 
-struct EmailCredentials: Codable {
-  let username: String
-  let password: String
-}
+private let logger = Logger(label: "email-service")
 
-enum EmailError: Error {
-  case invalidCredentials
-}
-
+/// Sends email via AWS SES in production, and logs to stdout in all other environments.
+///
+/// In production, the Lambda execution role must have `ses:SendEmail` permission.
+/// No explicit credentials are needed — `AWSClient()` automatically uses the role.
 actor EmailService {
   private let env: String
-  private let secretArn: String
   private let from: String
 
-  init(env: String, secretArn: String, from: String) {
+  init(env: String, from: String) {
     self.env = env
-    self.secretArn = secretArn
     self.from = from
   }
 
   func sendEmail(to recipient: String, subject: String, body: String) async throws {
-    guard env != "local", env != "test" else { return }
+    guard env == "production" else {
+      logger.info(
+        "EmailService: skipping send in \(env) — to=\(recipient) subject=\(subject)"
+      )
+      return
+    }
 
     let awsClient = AWSClient()
-    let secretsManager = SecretsManager(client: awsClient)
-    var secretsFetchError: (any Error)?
-    var secretResponse: SecretsManager.GetSecretValueResponse?
-    do {
-      secretResponse = try await secretsManager.getSecretValue(.init(secretId: secretArn))
-    } catch {
-      secretsFetchError = error
-    }
-    try await awsClient.shutdown()
-    if let error = secretsFetchError {
-      throw error
-    }
-
-    guard
-      let secretString = secretResponse?.secretString,
-      let secretData = secretString.data(using: .utf8),
-      let creds = try? JSONDecoder().decode(EmailCredentials.self, from: secretData)
-    else {
-      throw EmailError.invalidCredentials
-    }
-
-    let sesClient = AWSClient(
-      credentialProvider: .static(
-        accessKeyId: creds.username,
-        secretAccessKey: creds.password
-      )
-    )
-    let ses = SES(client: sesClient)
+    let ses = SES(client: awsClient)
     let request = SES.SendEmailRequest(
       destination: .init(toAddresses: [recipient]),
       message: .init(
@@ -68,7 +41,7 @@ actor EmailService {
     } catch {
       sendError = error
     }
-    try await sesClient.shutdown()
+    try await awsClient.shutdown()
     if let error = sendError {
       throw error
     }

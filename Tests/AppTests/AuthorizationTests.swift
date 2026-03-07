@@ -26,16 +26,27 @@ struct AuthorizationTests {
     try await user.save(on: db)
   }
 
-  // MARK: - CognitoAuthMiddleware
+  private func makeRouter(dbService: DatabaseService) async throws -> Router<AppRequestContext> {
+    let keyCollection = await TestJWT.keyCollection()
+    let router = Router(context: AppRequestContext.self)
+    router.middlewares.add(
+      OIDCAuthMiddleware(
+        keyCollection: keyCollection,
+        issuerURL: testIssuerURL,
+        clientID: testClientID
+      )
+    )
+    router.middlewares.add(AuthorizationMiddleware(db: try await dbService.db))
+    return router
+  }
+
+  // MARK: - OIDCAuthMiddleware
 
   @Test("Missing Authorization header returns 401")
   func missingAuthHeader() async throws {
-    let dbService = try DatabaseService(env: "local")
+    let dbService = DatabaseService(configuration: .memory)
     try await dbService.migrate()
-    let keyCollection = await TestJWT.keyCollection()
-    let router = Router(context: AppRequestContext.self)
-    router.middlewares.add(CognitoAuthMiddleware(keyCollection: keyCollection))
-    router.middlewares.add(AuthorizationMiddleware(db: try await dbService.db))
+    let router = try await makeRouter(dbService: dbService)
     router.get("/test") { _, _ in "" }
     let app = Application(router: router)
     try await app.test(.router) { client in
@@ -47,12 +58,9 @@ struct AuthorizationTests {
 
   @Test("Invalid Bearer token returns 401")
   func invalidBearerToken() async throws {
-    let dbService = try DatabaseService(env: "local")
+    let dbService = DatabaseService(configuration: .memory)
     try await dbService.migrate()
-    let keyCollection = await TestJWT.keyCollection()
-    let router = Router(context: AppRequestContext.self)
-    router.middlewares.add(CognitoAuthMiddleware(keyCollection: keyCollection))
-    router.middlewares.add(AuthorizationMiddleware(db: try await dbService.db))
+    let router = try await makeRouter(dbService: dbService)
     router.get("/test") { _, _ in "" }
     let app = Application(router: router)
     try await app.test(.router) { client in
@@ -70,14 +78,11 @@ struct AuthorizationTests {
 
   @Test("Customer user returns 200 with customer role")
   func customerRole() async throws {
-    let dbService = try DatabaseService(env: "local")
+    let dbService = DatabaseService(configuration: .memory)
     try await dbService.migrate()
     let sub = "customer-sub"
     try await createTestUser(dbService, sub: sub, role: .customer)
-    let keyCollection = await TestJWT.keyCollection()
-    let router = Router(context: AppRequestContext.self)
-    router.middlewares.add(CognitoAuthMiddleware(keyCollection: keyCollection))
-    router.middlewares.add(AuthorizationMiddleware(db: try await dbService.db))
+    let router = try await makeRouter(dbService: dbService)
     router.get("/test") { _, context in context.userRole?.rawValue ?? "unknown" }
     let app = Application(router: router)
     let token = try await TestJWT.token(sub: sub)
@@ -95,14 +100,11 @@ struct AuthorizationTests {
 
   @Test("Staff user returns 200 with staff role")
   func staffRole() async throws {
-    let dbService = try DatabaseService(env: "local")
+    let dbService = DatabaseService(configuration: .memory)
     try await dbService.migrate()
     let sub = "staff-sub"
     try await createTestUser(dbService, sub: sub, role: .staff)
-    let keyCollection = await TestJWT.keyCollection()
-    let router = Router(context: AppRequestContext.self)
-    router.middlewares.add(CognitoAuthMiddleware(keyCollection: keyCollection))
-    router.middlewares.add(AuthorizationMiddleware(db: try await dbService.db))
+    let router = try await makeRouter(dbService: dbService)
     router.get("/test") { _, context in context.userRole?.rawValue ?? "unknown" }
     let app = Application(router: router)
     let token = try await TestJWT.token(sub: sub)
@@ -120,14 +122,11 @@ struct AuthorizationTests {
 
   @Test("Admin user returns 200 with admin role")
   func adminRole() async throws {
-    let dbService = try DatabaseService(env: "local")
+    let dbService = DatabaseService(configuration: .memory)
     try await dbService.migrate()
     let sub = "admin-sub"
     try await createTestUser(dbService, sub: sub, role: .admin)
-    let keyCollection = await TestJWT.keyCollection()
-    let router = Router(context: AppRequestContext.self)
-    router.middlewares.add(CognitoAuthMiddleware(keyCollection: keyCollection))
-    router.middlewares.add(AuthorizationMiddleware(db: try await dbService.db))
+    let router = try await makeRouter(dbService: dbService)
     router.get("/test") { _, context in context.userRole?.rawValue ?? "unknown" }
     let app = Application(router: router)
     let token = try await TestJWT.token(sub: sub)
@@ -145,12 +144,9 @@ struct AuthorizationTests {
 
   @Test("Unknown sub returns 401")
   func unknownSub() async throws {
-    let dbService = try DatabaseService(env: "local")
+    let dbService = DatabaseService(configuration: .memory)
     try await dbService.migrate()
-    let keyCollection = await TestJWT.keyCollection()
-    let router = Router(context: AppRequestContext.self)
-    router.middlewares.add(CognitoAuthMiddleware(keyCollection: keyCollection))
-    router.middlewares.add(AuthorizationMiddleware(db: try await dbService.db))
+    let router = try await makeRouter(dbService: dbService)
     router.get("/test") { _, _ in "" }
     let app = Application(router: router)
     let token = try await TestJWT.token(sub: "unknown-sub")
