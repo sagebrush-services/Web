@@ -1,5 +1,5 @@
 {
-  "originHash" : "378edb64d5d8fb9adaecd1c3252afd8515aebd9754a6bc89ca7e7b1f2e3ad041",
+  "originHash" : "9ed81c822c43f46b4cfd77fcc42c17d1002649a8683ab1829c4de911f63b1f53",
   "pins" : [
     {
       "identity" : "async-http-client",
@@ -79,7 +79,7 @@
       "location" : "https://github.com/neon-law-foundation/Harness.git",
       "state" : {
         "branch" : "feature/dry-and-rename-flow-alignment",
-        "revision" : "36ccae23f8d8091976d450b1b0fc33b6e95b585a"
+        "revision" : "c936435e674b6b1e8db245b6317fc5d02c55c307"
       }
     },
     {
