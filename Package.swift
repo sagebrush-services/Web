@@ -22,7 +22,7 @@ let package = Package(
     .package(url: "https://github.com/soto-project/soto.git", from: "7.3.0"),
     .package(
       url: "https://github.com/neon-law-foundation/Harness.git",
-      branch: "feature/dry-and-rename-flow-alignment"),
+      branch: "main"),
     .package(url: "https://github.com/apple/swift-configuration.git", from: "1.0.0"),
     .package(url: "https://github.com/vapor/jwt-kit.git", from: "5.0.0"),
   ],
