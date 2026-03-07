@@ -3,6 +3,7 @@ import HarnessDAL
 import Hummingbird
 import HummingbirdLambda
 
+/// Request context used in non-Lambda (local and staging) environments.
 protocol AuthenticatedRequestContext: RequestContext {
   var authenticatedUser: AuthenticatedUser? { get set }
 }
@@ -23,6 +24,10 @@ struct AppRequestContext: RequestContext, AuthorizedRequestContext {
   }
 }
 
+/// Request context used only in the production Lambda runtime.
+///
+/// Carries the raw `APIGatewayV2Request` event alongside the standard
+/// request context, which is required by `HummingbirdLambda`.
 struct AppLambdaRequestContext: LambdaRequestContext, AuthorizedRequestContext {
   typealias Event = APIGatewayV2Request
   var coreContext: CoreRequestContextStorage
