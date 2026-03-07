@@ -44,7 +44,7 @@ struct AuthorizationTests {
 
   @Test("Missing Authorization header returns 401")
   func missingAuthHeader() async throws {
-    let dbService = try DatabaseService(env: "local")
+    let dbService = DatabaseService(configuration: .memory)
     try await dbService.migrate()
     let router = try await makeRouter(dbService: dbService)
     router.get("/test") { _, _ in "" }
@@ -58,7 +58,7 @@ struct AuthorizationTests {
 
   @Test("Invalid Bearer token returns 401")
   func invalidBearerToken() async throws {
-    let dbService = try DatabaseService(env: "local")
+    let dbService = DatabaseService(configuration: .memory)
     try await dbService.migrate()
     let router = try await makeRouter(dbService: dbService)
     router.get("/test") { _, _ in "" }
@@ -78,7 +78,7 @@ struct AuthorizationTests {
 
   @Test("Customer user returns 200 with customer role")
   func customerRole() async throws {
-    let dbService = try DatabaseService(env: "local")
+    let dbService = DatabaseService(configuration: .memory)
     try await dbService.migrate()
     let sub = "customer-sub"
     try await createTestUser(dbService, sub: sub, role: .customer)
@@ -100,7 +100,7 @@ struct AuthorizationTests {
 
   @Test("Staff user returns 200 with staff role")
   func staffRole() async throws {
-    let dbService = try DatabaseService(env: "local")
+    let dbService = DatabaseService(configuration: .memory)
     try await dbService.migrate()
     let sub = "staff-sub"
     try await createTestUser(dbService, sub: sub, role: .staff)
@@ -122,7 +122,7 @@ struct AuthorizationTests {
 
   @Test("Admin user returns 200 with admin role")
   func adminRole() async throws {
-    let dbService = try DatabaseService(env: "local")
+    let dbService = DatabaseService(configuration: .memory)
     try await dbService.migrate()
     let sub = "admin-sub"
     try await createTestUser(dbService, sub: sub, role: .admin)
@@ -144,7 +144,7 @@ struct AuthorizationTests {
 
   @Test("Unknown sub returns 401")
   func unknownSub() async throws {
-    let dbService = try DatabaseService(env: "local")
+    let dbService = DatabaseService(configuration: .memory)
     try await dbService.migrate()
     let router = try await makeRouter(dbService: dbService)
     router.get("/test") { _, _ in "" }

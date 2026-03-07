@@ -19,29 +19,9 @@ let oidcIssuerURL = config.string(forKey: "oidc.issuer.url", default: "")
 let oidcClientID = config.string(forKey: "oidc.client.id", default: "")
 
 switch env {
-case "production", "staging":
-  let secretArn = config.string(forKey: "db.secret.arn", default: "")
-  let awsClient = AWSClient()
-  let secretsManager = SecretsManager(client: awsClient)
-  let response = try await secretsManager.getSecretValue(.init(secretId: secretArn))
-  try await awsClient.shutdown()
-
-  guard
-    let secretString = response.secretString,
-    let secretData = secretString.data(using: .utf8),
-    let creds = try? JSONDecoder().decode(DatabaseCredentials.self, from: secretData)
-  else {
-    throw AppError.invalidDatabaseSecret
-  }
-
-  let databaseService = try DatabaseService(
-    env: env,
-    hostname: creds.host,
-    port: creds.port,
-    username: creds.username,
-    password: creds.password,
-    database: creds.dbname
-  )
+case "production":
+  let databaseURL = config.string(forKey: "database.url", default: "")
+  let databaseService = try DatabaseService(databaseURL: databaseURL)
 
   let keyCollection = try await buildJWTKeyCollection(
     env: env,
@@ -69,7 +49,7 @@ case "production", "staging":
   try await lambda.runService()
 
 default:
-  let databaseService = try DatabaseService(env: env)
+  let databaseService = DatabaseService()
   try await databaseService.migrate()
 
   let router = Router(context: AppRequestContext.self)
