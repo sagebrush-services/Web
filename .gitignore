@@ -7,3 +7,4 @@
 /dist-live
 /dist-prev
 db.sqlite
+dev.sqlite
