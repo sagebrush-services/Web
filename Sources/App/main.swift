@@ -9,11 +9,10 @@ import SotoSecretsManager
 
 let config = ConfigReader(provider: EnvironmentVariablesProvider())
 let env = config.string(forKey: "env", default: "local")
-let bucketName = config.string(forKey: "s3.bucket.name", default: "")
-let smtpSecretArn = config.string(forKey: "ses.smtp.secret.arn", default: "")
 let smtpFrom = config.string(forKey: "smtp.from", default: "")
+let bucketName = config.string(forKey: "s3.bucket.name", default: "")
 let storageService = StorageService(bucketName: bucketName)
-let emailService = EmailService(env: env, secretArn: smtpSecretArn, from: smtpFrom)
+let emailService = EmailService(env: env, from: smtpFrom)
 
 let oidcIssuerURL = config.string(forKey: "oidc.issuer.url", default: "")
 let oidcClientID = config.string(forKey: "oidc.client.id", default: "")

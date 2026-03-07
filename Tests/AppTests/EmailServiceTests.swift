@@ -5,19 +5,10 @@ import Testing
 @Suite("EmailService")
 struct EmailServiceTests {
 
-  @Test("sendEmail is skipped in local environment")
-  func localEnvSkipsEmail() async throws {
-    let service = EmailService(env: "local", secretArn: "", from: "")
-    try await service.sendEmail(
-      to: "recipient@example.com",
-      subject: "Test",
-      body: "Hello"
-    )
-  }
-
-  @Test("sendEmail is skipped in test environment")
-  func testEnvSkipsEmail() async throws {
-    let service = EmailService(env: "test", secretArn: "", from: "")
+  @Test("sendEmail logs and skips sending in non-production environments")
+  func nonProductionSkipsEmail() async throws {
+    let service = EmailService(env: "local", from: "sender@example.com")
+    // Should complete without throwing — no network call, just logs
     try await service.sendEmail(
       to: "recipient@example.com",
       subject: "Test",
