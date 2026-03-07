@@ -3,6 +3,12 @@ import JWTKit
 
 @testable import App
 
+/// Test issuer URL used in place of a real OIDC provider during testing.
+let testIssuerURL = "https://test.example.com"
+
+/// Test client ID used in place of a real Cognito App Client ID during testing.
+let testClientID = "test-client-id"
+
 private let testRSAPrivateKeyPEM = """
   -----BEGIN PRIVATE KEY-----
   MIIEvAIBADANBgkqhkiG9w0BAQEFAASCBKYwggSiAgEAAoIBAQCkRVT2KwE+hdEg
@@ -34,26 +40,35 @@ private let testRSAPrivateKeyPEM = """
   -----END PRIVATE KEY-----
   """
 
+/// Helpers for generating signed OIDC ID tokens in tests.
+///
+/// Uses a local RSA key pair so tests run offline without hitting a real
+/// OIDC discovery endpoint. Pass the key collection from `keyCollection()`
+/// into `buildJWTKeyCollection(env:issuerURL:clientID:injectedCollection:)`
+/// to wire the middleware without any network calls.
 struct TestJWT {
   static let rsaKey = try! Insecure.RSA.PrivateKey(pem: testRSAPrivateKeyPEM)
 
+  /// Signs a standard OIDC ID token with test claims.
   static func token(
     sub: String = "test-sub-\(UUID())",
-    email: String = "test@example.com",
-    groups: [String] = []
+    email: String = "test@example.com"
   ) async throws -> String {
-    let payload = CognitoJWTPayload(
+    let payload = OIDCIDTokenPayload(
+      iss: IssuerClaim(value: testIssuerURL),
       sub: SubjectClaim(value: sub),
-      email: email,
-      cognitoGroups: groups.isEmpty ? nil : groups,
-      tokenUse: "access",
-      exp: ExpirationClaim(value: Date().addingTimeInterval(3600))
+      aud: AudienceClaim(value: [testClientID]),
+      exp: ExpirationClaim(value: Date().addingTimeInterval(3600)),
+      iat: IssuedAtClaim(value: Date()),
+      email: email
     )
     let keyCollection = JWTKeyCollection()
     await keyCollection.add(rsa: rsaKey, digestAlgorithm: .sha256)
     return try await keyCollection.sign(payload)
   }
 
+  /// Returns a JWTKeyCollection backed by the test RSA public key.
+  /// Inject this into `buildJWTKeyCollection` to avoid OIDC discovery fetches.
   static func keyCollection() async -> JWTKeyCollection {
     let collection = JWTKeyCollection()
     await collection.add(rsa: rsaKey.publicKey, digestAlgorithm: .sha256)

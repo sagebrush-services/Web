@@ -15,6 +15,9 @@ let smtpFrom = config.string(forKey: "smtp.from", default: "")
 let storageService = StorageService(bucketName: bucketName)
 let emailService = EmailService(env: env, secretArn: smtpSecretArn, from: smtpFrom)
 
+let oidcIssuerURL = config.string(forKey: "oidc.issuer.url", default: "")
+let oidcClientID = config.string(forKey: "oidc.client.id", default: "")
+
 switch env {
 case "production", "staging":
   let secretArn = config.string(forKey: "db.secret.arn", default: "")
@@ -40,19 +43,22 @@ case "production", "staging":
     database: creds.dbname
   )
 
-  let poolId = config.string(forKey: "cognito.user.pool.id", default: "")
-  let cognitoRegion = config.string(forKey: "cognito.region", default: "us-west-2")
-  let rawIssuerOverride = config.string(forKey: "jwt.issuer.override", default: "")
-  let issuerOverride: String? = rawIssuerOverride.isEmpty ? nil : rawIssuerOverride
   let keyCollection = try await buildJWTKeyCollection(
-    poolId: poolId,
-    region: cognitoRegion,
-    issuerOverride: issuerOverride
+    env: env,
+    issuerURL: oidcIssuerURL,
+    clientID: oidcClientID,
+    injectedCollection: nil
   )
 
   let db = try await databaseService.db
   let router = Router(context: AppLambdaRequestContext.self)
-  router.middlewares.add(CognitoAuthMiddleware(keyCollection: keyCollection))
+  router.middlewares.add(
+    OIDCAuthMiddleware(
+      keyCollection: keyCollection,
+      issuerURL: oidcIssuerURL,
+      clientID: oidcClientID
+    )
+  )
   router.middlewares.add(AuthorizationMiddleware(db: db))
   try APIHandler(
     databaseService: databaseService,

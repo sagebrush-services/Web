@@ -4,7 +4,7 @@ import Hummingbird
 import HummingbirdLambda
 
 protocol AuthenticatedRequestContext: RequestContext {
-  var cognitoUser: CognitoUser? { get set }
+  var authenticatedUser: AuthenticatedUser? { get set }
 }
 
 protocol AuthorizedRequestContext: AuthenticatedRequestContext {
@@ -13,12 +13,12 @@ protocol AuthorizedRequestContext: AuthenticatedRequestContext {
 
 struct AppRequestContext: RequestContext, AuthorizedRequestContext {
   var coreContext: CoreRequestContextStorage
-  var cognitoUser: CognitoUser?
+  var authenticatedUser: AuthenticatedUser?
   var userRole: UserRole?
 
   init(source: Source) {
     self.coreContext = .init(source: source)
-    self.cognitoUser = nil
+    self.authenticatedUser = nil
     self.userRole = nil
   }
 }
@@ -27,13 +27,13 @@ struct AppLambdaRequestContext: LambdaRequestContext, AuthorizedRequestContext {
   typealias Event = APIGatewayV2Request
   var coreContext: CoreRequestContextStorage
   let event: APIGatewayV2Request
-  var cognitoUser: CognitoUser?
+  var authenticatedUser: AuthenticatedUser?
   var userRole: UserRole?
 
   init(source: Source) {
     self.coreContext = .init(source: source)
     self.event = source.event
-    self.cognitoUser = nil
+    self.authenticatedUser = nil
     self.userRole = nil
   }
 }
